@@ -11,15 +11,13 @@ def _download(url: str, dest_path: str):
     req.raise_for_status()
 
     with open(dest_path, "wb") as fd:
-        for chunk in req.iter_content(chunk_size=2**20):
+        for chunk in req.iter_content(chunk_size=2 ** 20):
             fd.write(chunk)
 
 
 def get_data():
 
-    ratings_url = (
-        "http://www2.informatik.uni-freiburg.de/" "~cziegler/BX/BX-CSV-Dump.zip"
-    )
+    ratings_url = ("http://www2.informatik.uni-freiburg.de/" "~cziegler/BX/BX-CSV-Dump.zip")
 
     if not os.path.exists("data"):
         os.makedirs("data")
@@ -29,15 +27,11 @@ def get_data():
     with zipfile.ZipFile("data/data.zip") as archive:
         return (
             csv.DictReader(
-                (
-                    x.decode("utf-8", "ignore")
-                    for x in archive.open("BX-Book-Ratings.csv")
-                ),
+                (x.decode("utf-8", "ignore") for x in archive.open("BX-Book-Ratings.csv")),
                 delimiter=";",
             ),
             csv.DictReader(
-                (x.decode("utf-8", "ignore") for x in archive.open("BX-Books.csv")),
-                delimiter=";",
+                (x.decode("utf-8", "ignore") for x in archive.open("BX-Books.csv")), delimiter=";"
             ),
         )
 

@@ -7,6 +7,10 @@ import textwrap
 
 from setuptools import Command, Extension, setup
 
+# Import version even when extensions are not yet built
+__builtins__.__LIGHTFM_SETUP__ = True
+from lightfm import __version__ as version  # NOQA
+
 
 def define_extensions(use_openmp):
     compile_args = []
@@ -120,8 +124,7 @@ class Cythonize(Command):
                     ["lightfm/_lightfm_fast_openmp.pyx"],
                     extra_link_args=["-fopenmp"],
                 ),
-            ],
-            compiler_directives={'language_level' : "3"}
+            ]
         )
 
 
@@ -147,18 +150,6 @@ class Clean(Command):
         subprocess.call(["rm", os.path.join(pth, "lightfm", "_lightfm_fast.so")])
 
 
-def read_version():
-    mod = {}
-    path = os.path.join(
-        os.path.dirname(__file__),
-        "lightfm",
-        "version.py",
-    )
-    with open(path) as fd:
-        exec(fd.read(), mod)
-    return mod["__version__"]
-
-
 use_openmp = not sys.platform.startswith("darwin") and not sys.platform.startswith(
     "win"
 )
@@ -167,12 +158,12 @@ long_description = pathlib.Path(__file__).parent.joinpath("README.md").read_text
 
 setup(
     name="lightfm",
-    version=read_version(),
+    version=version,
     description="LightFM recommendation model",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/lyst/lightfm",
-    download_url="https://github.com/lyst/lightfm/tarball/{}".format(read_version()),
+    download_url="https://github.com/lyst/lightfm/tarball/{}".format(version),
     packages=["lightfm", "lightfm.datasets"],
     package_data={"": ["*.c"]},
     install_requires=["numpy", "scipy>=0.17.0", "requests", "scikit-learn"],
